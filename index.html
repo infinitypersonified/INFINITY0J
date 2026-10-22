@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f1f0ed">
+  <meta name="description" content="Ojakorotu Prosper Oghenefegor — full stack developer building thoughtful digital products and experiences.">
+  <title>Ojakorotu Prosper Oghenefegor — Full Stack Developer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="script.js"></script>
+</head>
+<body>
+  <main class="showcase" id="showcase" data-backdrop="split">
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="Infinite OJ home"><img src="logo.jpeg" alt=""><span>INFINITE OJ</span></a>
+      <span class="availability"><i></i> FULL STACK DEVELOPER <b>·</b> NIGERIA</span>
+      <div class="backdrop-picker" aria-label="Choose backdrop">
+        <button class="active" data-backdrop="split">Split</button><button data-backdrop="glow">Glow</button><button data-backdrop="orbit">Orbit</button>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode"><span aria-hidden="true">☾</span><b>LIGHT</b></button>
+      <a class="contact-shortcut" href="mailto:ojakorotuprosper54@gmail.com">LET'S TALK <span>&rarr;</span></a>
+    </header>
+
+    <section class="device-stage" aria-label="Interactive foldable portfolio">
+      <div class="stage-caption"><span>OJAKOROTU PROSPER OGHENEFEGHOR</span><span id="stage-action">TAP TO OPEN WORK</span></div>
+      <div class="device-perspective">
+        <div class="device" id="device" data-finish="titanium" aria-label="Foldable phone portfolio">
+          <div class="device-rim"></div>
+          <div class="device-screen">
+            <section class="lock-screen" id="lock-screen" aria-label="Phone lock screen">
+              <div class="lock-photo"></div><div class="lock-shade"></div>
+              <div class="lock-status"><span id="lock-status-time">9:41</span><span class="status-icons"><i></i><i></i><b></b></span></div>
+              <div class="lock-clock"><span id="lock-date">Wednesday, October 22</span><strong id="lock-time">9:41</strong></div>
+              <div class="lock-notification"><span>INFINITE OJ</span><strong>Your portfolio is ready</strong><p>Selected work and projects are waiting to be explored.</p></div>
+              <button class="unlock-button" id="unlock-button" type="button">OPEN MY WORK <span>&uarr;</span></button>
+              <div class="lock-home-indicator"></div>
+            </section>
+
+            <section class="app-screen" id="app-screen" aria-hidden="true">
+              <div class="app-status"><span id="app-time">9:41</span><span>5G <b class="battery"><i></i></b></span><button id="relock-button" class="relock-button" type="button" aria-label="Close phone">&times;</button></div>
+              <div class="app-scroll" id="app-scroll"><div class="app-content" id="app-content"></div></div>
+              <nav class="screen-nav" aria-label="Portfolio pages">
+                <button class="selected" data-page="home">Home</button><button data-page="work">Work</button><button data-page="archive">Archive</button><button data-page="about">About</button><button data-page="contact">Contact</button>
+              </nav>
+              <div class="app-home-indicator"></div>
+            </section>
+            <div class="screen-crease" aria-hidden="true"></div>
+          </div>
+          <div class="hinge-spine" aria-hidden="true"></div>
+          <div class="fold-panel fold-panel-left" aria-hidden="true"></div>
+          <div class="fold-panel fold-panel-right" aria-hidden="true"></div>
+          <div class="side-button side-button-left" aria-hidden="true"></div><div class="side-button side-button-right" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="device-hint" id="device-hint">TAP THE SCREEN TO OPEN YOUR PORTFOLIO</div>
+      <div class="finish-picker" aria-label="Choose phone finish">
+        <button class="finish titanium active" data-finish="titanium" aria-label="Titanium"></button><button class="finish graphite" data-finish="graphite" aria-label="Graphite"></button><button class="finish coral" data-finish="coral" aria-label="Coral"></button><button class="finish sage" data-finish="sage" aria-label="Sage"></button>
+      </div>
+      <div class="stage-footer"><span>DESIGNED TO UNFOLD</span><span>SCROLL INSIDE THE PHONE TO EXPLORE</span><span>INFINITE OJ &copy; 2026</span></div>
+    </section>
+  </main>
+</body>
+</html>
