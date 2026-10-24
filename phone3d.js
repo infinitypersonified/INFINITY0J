@@ -3,6 +3,7 @@ import {RoomEnvironment} from 'three/examples/jsm/environments/RoomEnvironment.j
 import portraitUrl from './portrait.jpeg';
 const W=2.25,H=2.7,T=.075,GAP=.004,OFF=W/2+GAP,SHI=H-.1,SWI=W-.062,CXI=(2*GAP+W-.038)/2,XEDGE=GAP+W-.05,PZ=(T+.01)/2,CW=700,CH=832,CS=.9;
 const FIN={titanium:'#b9b7b1',graphite:'#3b3c3f',coral:'#d99c8d',sage:'#a9b6a0'};
+const POSM=[[-1.0,1.8,.2],[0,2.0,-.3],[1.0,1.75,.3],[-1.05,-1.65,.3],[0,-1.8,-.3],[1.05,-1.65,.2]];
 const POS=[[-2.05,.95,.3],[-2.55,-.2,-.6],[-2.0,-1.05,.5],[2.05,1.0,-.2],[2.55,-.15,.4],[2.0,-1.1,-.5]];
 const mobile=()=>innerWidth<760||innerWidth/innerHeight<.9;
 const ease=(a,b,x)=>{x=Math.min(1,Math.max(0,(x-a)/(b-a)));return x*x*(3-2*x)};
@@ -79,12 +80,14 @@ export function createPhone({host,overlay,onState,onProgress=()=>{},atTop=()=>tr
   new ResizeObserver(size).observe(host);size();
   function place(mb){
     holder.updateMatrixWorld(true);cam.updateMatrixWorld(true);const rw=host.clientWidth,rh=host.clientHeight;
+    if(mb){const hw=Math.round(rw-12),hh=Math.round(rh-12),tf='translate(6px,6px) scale(1)';if(tf!==lastTf){lastTf=tf;overlay.style.transform=tf}
+      const key='m|'+hw+'|'+hh;if(key!==clipKey){clipKey=key;overlay.dataset.mode='single';overlay.style.width=hw+'px';overlay.style.height=hh+'px';overlay.style.clipPath=`path('${rp(0,0,hw,hh,[26,26,26,26])}')`}return}
     const P=(x,y)=>{const v=new THREE.Vector3(x,y,T/2+.0014);rig.localToWorld(v);v.project(cam);return [(v.x*.5+.5)*rw,(1-(v.y*.5+.5))*rh]};
-    const xa=mb?CXI-SWI/2:-XEDGE,xb=mb?CXI+SWI/2:XEDGE,span=xb-xa,a=P(xa,SHI/2),b=P(xb,-SHI/2);
-    const d=zOpen(mb)-T/2,restPx=span/(2*d*Math.tan(THREE.MathUtils.degToRad(15))*cam.aspect)*rw,Z=mb?1:1.15;
-    const hw=Math.max(mb?340:780,Math.round(restPx/Z)),hh=Math.round(hw*SHI/span),sc=((b[0]-a[0])/hw).toFixed(4);
+    const xa=-XEDGE,xb=XEDGE,span=xb-xa,a=P(xa,SHI/2),b=P(xb,-SHI/2);
+    const d=zOpen(false)-T/2,restPx=span/(2*d*Math.tan(THREE.MathUtils.degToRad(15))*cam.aspect)*rw,Z=1.15;
+    const hw=Math.max(780,Math.round(restPx/Z)),hh=Math.round(hw*SHI/span),sc=((b[0]-a[0])/hw).toFixed(4);
     const tf=`translate(${Math.round(a[0])}px,${Math.round(a[1])}px) scale(${sc})`;if(tf!==lastTf){lastTf=tf;overlay.style.transform=tf}
-    const key=mb+'|'+hw;if(key!==clipKey){clipKey=key;const R=.075*hw/span;overlay.dataset.mode=mb?'single':'dual';overlay.style.width=hw+'px';overlay.style.height=hh+'px';overlay.style.clipPath=`path('${rp(0,0,hw,hh,[R,R,R,R])}')`}
+    const key='d|'+hw;if(key!==clipKey){clipKey=key;const R=.075*hw/span;overlay.dataset.mode='dual';overlay.style.width=hw+'px';overlay.style.height=hh+'px';overlay.style.clipPath=`path('${rp(0,0,hw,hh,[R,R,R,R])}')`}
   }
   function frame(now){
     const dt=Math.min(.05,(now-last)/1000);last=now;s.t+=dt;const mb=mobile(),k=1-Math.exp(-dt*3.2);
@@ -92,16 +95,16 @@ export function createPhone({host,overlay,onState,onProgress=()=>{},atTop=()=>tr
     const phi=mb?Math.PI:Math.PI*(1-ue);left.rotation.y=-phi;hinge.position.z=-PZ*phi/Math.PI;
     const b=ease(2.5,1.1,phi);mats.left.color.setScalar(.04+.96*b);
     rig.position.x=mb?-OFF:-OFF*(1-ease(.08,.96,p));
-    const zc=fit(3.5,4.0),zo=zOpen(mb);cam.position.set(0,0,zc+(zo-zc)*ease(.3,1,p));cam.lookAt(0,0,0);
+    const zc=mb?fit(2.7,3.5):fit(3.5,4.0),zo=zOpen(mb);cam.position.set(0,0,zc+(zo-zc)*ease(.3,1,p));cam.lookAt(0,0,0);
     m.x+=(mouse.x-m.x)*k;m.y+=(mouse.y-m.y)*k;const calm=1-ease(.6,1,p);
     holder.position.y=Math.sin(s.t*1.2)*.03*calm;
     holder.rotation.set(-m.y*.14*calm,(.45*(1-p)+m.x*.28)*calm,0);
     host.style.setProperty('--sw',(30+34*ue)+'%');
     const f=p>.5;if(f!==unf){unf=f;onProgress(f)}
-    const ok=(orbitOn&&!mb?1:0)*(1-ease(0,.25,p)),sx=Math.min(1.15,cam.aspect/1.7);orbitG.visible=ok>.01;
+    const ok=(orbitOn?1:0)*(1-ease(0,.25,p)),sx=mb?1:Math.min(1.15,cam.aspect/1.7),ms=mb?.52:1;orbitG.visible=ok>.01;
     if(orbitG.visible)cards.forEach((c,i)=>{const hv=hover===i||(drag&&drag.i===i);c.h+=((hv?1:0)-c.h)*Math.min(1,dt*9);
-      c.g.visible=true;c.g.scale.setScalar(Math.max(.001,ok*(1+.16*c.h)));
-      c.g.position.set(c.p[0]*sx+m.x*c.p[2]*.18,c.p[1]+Math.sin(s.t*.9+c.ph)*.12+m.y*.08*c.p[2],c.p[2]+c.h*.5);
+      c.g.visible=true;c.g.scale.setScalar(Math.max(.001,ok*ms*(1+.16*c.h)));const pp=mb?POSM[i]:c.p;
+      c.g.position.set(pp[0]*sx+m.x*pp[2]*.18,pp[1]+Math.sin(s.t*.9+c.ph)*(mb?.06:.12)+m.y*.08*pp[2],pp[2]+c.h*.5);
       c.spin.x+=c.vel.x;c.spin.y+=c.vel.y;c.vel.x*=.93;c.vel.y*=.93;const dm=drag&&drag.i===i?0:dt*.7;c.spin.x*=1-dm;c.spin.y*=1-dm;
       c.g.rotation.set(Math.cos(s.t*.4+c.ph)*.12+c.spin.x-m.y*.25*c.h,Math.sin(s.t*.5+c.ph)*.3+c.spin.y+m.x*.3*c.h,0)});
     place(mb);const o=ease(.95,.995,p);overlay.style.opacity=o;overlay.style.pointerEvents=o>.9?'auto':'none';
@@ -113,7 +116,7 @@ export function createPhone({host,overlay,onState,onProgress=()=>{},atTop=()=>tr
   const api={open(){push(1)},close(){pt=0;if(state!=='hero'){state='hero';onState(state)}},isOpen:()=>state==='open',setFinish(n){metal.color.set(FIN[n]||FIN.titanium)},setOrbit(v){orbitOn=!!v}};
   host.addEventListener('wheel',e=>{if(state==='open'){if(e.deltaY<0&&atTop()){over+=-e.deltaY;if(over>60)push(e.deltaY/700)}else over=0}else push(e.deltaY/700)},{passive:true});
   let ty=0;host.addEventListener('touchstart',e=>{ty=e.touches[0].clientY;over=0},{passive:true});
-  host.addEventListener('touchmove',e=>{const y=e.touches[0].clientY,dy=y-ty;ty=y;if(state==='open'){if(dy>0&&atTop()){over+=dy;if(over>50)push(-dy/380)}else over=0}else push(-dy/380)},{passive:true});
+  host.addEventListener('touchmove',e=>{if(drag)return;const y=e.touches[0].clientY,dy=y-ty;ty=y;if(state==='open'){if(dy>0&&atTop()){over+=dy;if(over>50)push(-dy/380)}else over=0}else push(-dy/380)},{passive:true});
   const redraw=()=>{tex.left.draw();tex.right.draw();cards.forEach(c=>c.ct.draw())};
   (document.fonts?document.fonts.load('300px Anton').then(()=>document.fonts.load('700 24px "Manrope Variable"')):Promise.resolve()).finally(redraw);
   photo.onload=redraw;setInterval(()=>{tex.right.draw()},30000);
