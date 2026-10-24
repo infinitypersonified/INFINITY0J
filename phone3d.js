@@ -23,7 +23,6 @@ function screenTex(kind,photo,label){
       g.textAlign='center';g.font='500 22px DM Mono, monospace';g.fillStyle='#ffffffe0';g.fillText(d.toLocaleDateString('en-NG',{weekday:'long',month:'long',day:'numeric'}).toUpperCase(),350,350);
       g.fillStyle='#fff';g.font='400 235px Anton, sans-serif';g.fillText(d.toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit',hour12:false}),350,556);
       card(g,596,'Kinda is live','SOCIAL TASK APP · NOW');card(g,696,'Ghost Protocol','E2E ENCRYPTED · 2H AGO');
-      g.fillStyle='#ffffffd0';g.textAlign='center';g.font='500 20px DM Mono, monospace';g.fillText('SCROLL TO UNFOLD',350,812);
     }else{g.fillStyle='#f4f3ef';g.fillRect(0,0,CW,CH);g.fillStyle='#e6e5e0';g.font='400 170px Anton, sans-serif';g.textAlign='center';g.fillText(label,350,470)}
   });
 }
@@ -84,10 +83,10 @@ export function createPhone({host,overlay,onState,onProgress=()=>{},atTop=()=>tr
       const key='m|'+hw+'|'+hh;if(key!==clipKey){clipKey=key;overlay.dataset.mode='single';overlay.style.width=hw+'px';overlay.style.height=hh+'px';overlay.style.clipPath=`path('${rp(0,0,hw,hh,[26,26,26,26])}')`}return}
     const P=(x,y)=>{const v=new THREE.Vector3(x,y,T/2+.0014);rig.localToWorld(v);v.project(cam);return [(v.x*.5+.5)*rw,(1-(v.y*.5+.5))*rh]};
     const xa=-XEDGE,xb=XEDGE,span=xb-xa,a=P(xa,SHI/2),b=P(xb,-SHI/2);
-    const d=zOpen(false)-T/2,restPx=span/(2*d*Math.tan(THREE.MathUtils.degToRad(15))*cam.aspect)*rw,Z=1.15;
+    const d=zOpen(false)-T/2,restPx=span/(2*d*Math.tan(THREE.MathUtils.degToRad(15))*cam.aspect)*rw,Z=1.0;
     const hw=Math.max(780,Math.round(restPx/Z)),hh=Math.round(hw*SHI/span),sc=((b[0]-a[0])/hw).toFixed(4);
     const tf=`translate(${Math.round(a[0])}px,${Math.round(a[1])}px) scale(${sc})`;if(tf!==lastTf){lastTf=tf;overlay.style.transform=tf}
-    const key='d|'+hw;if(key!==clipKey){clipKey=key;const R=.075*hw/span;overlay.dataset.mode='dual';overlay.style.width=hw+'px';overlay.style.height=hh+'px';overlay.style.clipPath=`path('${rp(0,0,hw,hh,[R,R,R,R])}')`}
+    const key='d|'+hw;if(key!==clipKey){clipKey=key;const R=.075*hw/span;overlay.dataset.mode='dual';overlay.style.setProperty('--oh',hh+'px');overlay.style.width=hw+'px';overlay.style.height=hh+'px';overlay.style.clipPath=`path('${rp(0,0,hw,hh,[R,R,R,R])}')`}
   }
   function frame(now){
     const dt=Math.min(.05,(now-last)/1000);last=now;s.t+=dt;const mb=mobile(),k=1-Math.exp(-dt*3.2);

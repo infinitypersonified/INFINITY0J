@@ -61,9 +61,10 @@ const archiveExtra=[
 {title:'Agro Link',group:'Apps',tone:'#d9e0c6',note:'A farmers-to-consumers agri-marketplace.',tags:['Marketplace']},
 {title:'Inventory System',group:'Web',tone:'#e2d8c4',note:'An inventory management system with demand forecasting, built in PHP and MySQL.',tags:['PHP','MySQL']}];
 const groupOf=p=>({Kinda:'Apps',Trend:'Apps',Foodee:'Apps',Safeguard:'Apps','Phishing Email Detection':'Security'}[p.title]||'Web');
+function archiveAll(){return projects.map(p=>({title:p.title,tone:p.tone,group:groupOf(p),live:!!p.live,real:true,note:p.summary,tags:p.stack})).concat(archiveExtra.map(x=>({...x,live:false,real:false})))}
 function renderArchive(){
   currentPage='archive';setNav('archive');
-  const all=projects.map(p=>({title:p.title,tone:p.tone,group:groupOf(p),live:!!p.live,real:true,note:p.summary,tags:p.stack})).concat(archiveExtra.map(x=>({...x,live:false,real:false})));
+  const all=archiveAll();
   const groups=['Apps','Web','Security'],live=all.filter(a=>a.live);
   const icon=a=>`<button class="hs-icon" data-app="${a.title}"><span class="hs-ico" style="--tone:${a.tone}"><b>${a.title.trim()[0]}</b>${a.live?'<i class="hs-dot"></i>':''}</span><em>${a.title}</em></button>`;
   const folder=g=>`<button class="hs-icon" data-folder="${g}"><span class="hs-fbox">${all.filter(a=>a.group===g).slice(0,4).map(a=>`<s style="--tone:${a.tone}">${a.title.trim()[0]}</s>`).join('')}</span><em>${g}</em></button>`;
@@ -86,7 +87,8 @@ function renderContact(){
 }
 function wirePageActions(){appContent.querySelectorAll('[data-go="work"]').forEach(button=>button.addEventListener('click',renderWork))}
 function renderPage(page){if(page==='home')renderHome();else if(page==='work')renderWork();else if(page==='archive')renderArchive();else if(page==='about')renderAbout();else if(page==='contact')renderContact()}
-const phone=createPhone({host:document.querySelector('#stage3d'),overlay:document.querySelector('#screen-overlay'),items:projects.slice(0,6).map(p=>({title:p.title,tone:p.tone,sub:p.stack.slice(0,2).join(' · ')})),atTop:()=>lenis.scroll<=2,onProgress:f=>showcase.classList.toggle('unfolded',f),onPick:i=>{phone.open();renderProjectDetail(projects[i].title)},onState:state=>{const o=state==='open';showcase.classList.toggle('portfolio-open',o);appScreen.setAttribute('aria-hidden',String(!o));deviceHint.textContent=o?'PORTFOLIO OPEN · SELECT A PAGE TO EXPLORE':'SCROLL OR TAP TO UNFOLD YOUR PORTFOLIO';stageAction.textContent=o?'SELECT A PAGE TO EXPLORE':'SCROLL TO UNFOLD';if(o){renderPage('home')}}});
+const IOS=innerWidth<760||innerWidth/innerHeight<.9;
+const phone=IOS?{open(){},close(){},setFinish(){},setOrbit(){},isOpen:()=>false}:createPhone({host:document.querySelector('#stage3d'),overlay:document.querySelector('#screen-overlay'),items:projects.slice(0,6).map(p=>({title:p.title,tone:p.tone,sub:p.stack.slice(0,2).join(' · ')})),atTop:()=>lenis.scroll<=2,onProgress:f=>showcase.classList.toggle('unfolded',f),onPick:i=>{phone.open();renderProjectDetail(projects[i].title)},onState:state=>{const o=state==='open';showcase.classList.toggle('portfolio-open',o);appScreen.setAttribute('aria-hidden',String(!o));deviceHint.textContent=o?'PORTFOLIO OPEN · SELECT A PAGE TO EXPLORE':'SCROLL OR TAP TO UNFOLD YOUR PORTFOLIO';stageAction.textContent=o?'SELECT A PAGE TO EXPLORE':'SCROLL TO UNFOLD';if(o){renderPage('home')}}});
 deviceHint.textContent='SCROLL OR TAP TO UNFOLD YOUR PORTFOLIO';stageAction.textContent='SCROLL TO UNFOLD';
 function closeDevice(){phone.close()}
 function setTheme(theme){showcase.dataset.theme=theme;document.body.dataset.theme=theme;document.documentElement.style.colorScheme=theme;const dark=theme==='dark';const c=document.querySelector('#theme-toggle');c.innerHTML=`<span aria-hidden="true">${dark?'☀':'☾'}</span><b>${dark?'DARK':'LIGHT'}</b>`;c.setAttribute('aria-label',`Switch to ${dark?'light':'dark'} mode`);document.querySelector('meta[name="theme-color"]').content=dark?'#171815':'#f1f0ed'}
@@ -99,3 +101,50 @@ document.querySelectorAll('.screen-nav button').forEach(b=>{const l=b.textConten
 document.querySelectorAll('.backdrop-picker button[data-backdrop]').forEach(b=>b.addEventListener('click',()=>{showcase.dataset.backdrop=b.dataset.backdrop;phone.setOrbit(b.dataset.backdrop==='orbit');document.querySelectorAll('.backdrop-picker button').forEach(i=>i.classList.toggle('active',i===b))}));
 document.querySelectorAll('.finish-picker button[data-finish]').forEach(b=>b.addEventListener('click',()=>{phone.setFinish(b.dataset.finish);document.querySelectorAll('.finish-picker button').forEach(i=>i.classList.toggle('active',i===b))}));
 document.querySelector('.brand').addEventListener('click',e=>{e.preventDefault();closeDevice()});
+
+if(IOS){document.body.classList.add('ios-mode');initIOS()}
+matchMedia('(max-width:759px)').addEventListener('change',()=>location.reload());
+function initIOS(){
+  const live=projects.filter(p=>p.live),all=archiveAll(),groups=['Apps','Web','Security'];
+  const ico=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+  const icon=a=>`<button class="ios-icon" data-app="${a.title}"><span class="ios-ico" style="--tone:${a.tone}"><b>${a.title.trim()[0]}</b>${a.title==='Kinda'?'<i class="ios-badge">1</i>':''}</span><em>${a.title}</em></button>`;
+  const folder=g=>`<button class="ios-icon" data-folder="${g}"><span class="ios-fbox">${all.filter(a=>a.group===g).slice(0,4).map(a=>`<s style="--tone:${a.tone}"></s>`).join('')}</span><em>${g}</em></button>`;
+  const dock=[['work','#171816'],['archive','#d96c3b'],['about','#2f6f5e'],['contact','#3d5a98']].map(([k,c])=>`<button class="ios-dock-app" data-open="${k}" aria-label="${k}" style="background:${c}">${ico(NAVICO[k])}</button>`).join('');
+  const ios=document.createElement('div');ios.id='ios';ios.dataset.state='lock';
+  ios.innerHTML=`<div class="ios-island"></div>
+<section class="ios-lock"><img src="${portraitUrl}" alt="Ojakorotu Prosper"><div class="ios-shade"></div><div class="ios-lstat"><span>INFINITE OJ</span><span>5G 87%</span></div>
+<div class="ios-date"></div><div class="ios-clock"></div><div class="ios-role">Full stack developer · Nigeria</div>
+<button class="ios-notif" data-n="Kinda"><span style="background:#ecc2ab">K</span><div><b>Kinda is live</b><em>SOCIAL TASK APP · NOW</em></div></button>
+<button class="ios-notif" data-n="archive"><span style="background:#cdd3d8">G</span><div><b>Ghost Protocol</b><em>E2E ENCRYPTED · 2H AGO</em></div></button>
+<div class="ios-lbtn l">${ico('<path d="M8 3h8v4l-2 3v11h-4V10L8 7z"/>')}</div><div class="ios-lbtn r">${ico('<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>')}</div>
+<button class="ios-hint">SWIPE UP TO UNLOCK</button></section>
+<section class="ios-home"><div class="ios-hstat"><span class="ios-time"></span><span class="ios-hr"></span></div>
+<div class="ios-widgets"><button class="ios-widget hot" data-app="Kinda"><small>NOW BUILDING</small><div><strong>Kinda</strong><span>Social task app</span></div></button><button class="ios-widget" data-open="archive"><small>PORTFOLIO</small><div><strong>${all.length}</strong><span>projects · ${live.length} live</span></div></button></div>
+<div class="ios-grid">${live.map(icon).join('')}${groups.map(folder).join('')}</div>
+<div class="ios-dots"><i></i><i></i></div><div class="ios-dock">${dock}</div>
+<div class="ios-fsheet" hidden></div></section>
+<div class="ios-app"></div><button class="ios-bar" aria-label="Home"></button>`;
+  showcase.append(ios);
+  const app=ios.querySelector('.ios-app'),lock=ios.querySelector('.ios-lock'),home=ios.querySelector('.ios-home'),fs=ios.querySelector('.ios-fsheet');
+  app.append(document.querySelector('#screen-overlay'));ios.querySelector('.ios-hr').append(document.querySelector('#theme-toggle'));
+  const tick2=()=>{const d=new Date();ios.querySelector('.ios-clock').textContent=d.toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit',hour12:false});ios.querySelector('.ios-date').textContent=d.toLocaleDateString('en-NG',{weekday:'long',month:'long',day:'numeric'}).toUpperCase();ios.querySelector('.ios-time').textContent=d.toLocaleTimeString('en-NG',{hour:'numeric',minute:'2-digit'})};tick2();setInterval(tick2,15000);
+  const set=s=>{ios.dataset.state=s;lock.style.transform='';fs.hidden=true};
+  const openApp=(fn,el)=>{const r=(el||ios).getBoundingClientRect();app.style.transformOrigin=`${r.left+r.width/2}px ${r.top+r.height/2}px`;fn();set('app')};
+  const pages={work:renderWork,archive:renderArchive,about:renderAbout,contact:renderContact};
+  const openByTitle=(t,el)=>{const a=all.find(x=>x.title===t);if(a&&a.real)openApp(()=>renderProjectDetail(t),el);else if(a)note(a)};
+  const note=a=>{fs.innerHTML=`<div class="ios-fcard"><button class="ios-fx" data-x>×</button><span class="ios-ico big" style="--tone:${a.tone}"><b>${a.title[0]}</b></span><h2>${a.title}</h2><p>${a.note}</p><div class="detail-tags">${a.tags.map(t=>`<span>${t}</span>`).join('')}</div></div>`;fs.hidden=false;fs.querySelector('[data-x]').onclick=()=>fs.hidden=true};
+  const wire=root=>{root.querySelectorAll('[data-app]').forEach(b=>b.addEventListener('click',()=>openByTitle(b.dataset.app,b)));root.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>openApp(pages[b.dataset.open],b)))};
+  wire(home);
+  home.querySelectorAll('[data-folder]').forEach(b=>b.addEventListener('click',()=>{const g=b.dataset.folder;fs.innerHTML=`<div class="ios-fcard"><button class="ios-fx" data-x>×</button><h2>${g}</h2><div class="ios-grid in">${all.filter(a=>a.group===g).map(icon).join('')}</div></div>`;fs.hidden=false;fs.querySelector('[data-x]').onclick=()=>fs.hidden=true;fs.querySelectorAll('[data-app]').forEach(x=>x.addEventListener('click',()=>{const a=all.find(y=>y.title===x.dataset.app);if(a.real){fs.hidden=true;openApp(()=>renderProjectDetail(a.title),x)}else note(a)}))}));
+  fs.addEventListener('click',e=>{if(e.target===fs)fs.hidden=true});
+  ios.querySelectorAll('.ios-notif').forEach(b=>b.addEventListener('click',()=>{const n=b.dataset.n;if(n==='Kinda')openApp(()=>renderProjectDetail('Kinda'),b);else openApp(renderArchive,b)}));
+  ios.querySelector('.ios-hint').addEventListener('click',()=>set('home'));
+  ios.querySelector('.ios-bar').addEventListener('click',()=>{if(ios.dataset.state==='app')set('home');else if(ios.dataset.state==='home')set('lock')});
+  let y0=null,dy=0;lock.addEventListener('touchstart',e=>{y0=e.touches[0].clientY;dy=0},{passive:true});
+  lock.addEventListener('touchmove',e=>{if(y0===null)return;dy=y0-e.touches[0].clientY;if(dy>0){lock.style.transition='none';lock.style.transform=`translateY(${-dy}px)`}},{passive:true});
+  lock.addEventListener('touchend',()=>{lock.style.transition='';if(dy>110)set('home');else lock.style.transform='';y0=null});
+  lock.addEventListener('wheel',e=>{if(e.deltaY>30)set('home')},{passive:true});
+  let h0=null,hd=0;home.addEventListener('touchstart',e=>{h0=e.touches[0].clientY<140?e.touches[0].clientY:null;hd=0},{passive:true});
+  home.addEventListener('touchmove',e=>{if(h0!==null)hd=e.touches[0].clientY-h0},{passive:true});
+  home.addEventListener('touchend',()=>{if(h0!==null&&hd>90)set('lock');h0=null});
+}
